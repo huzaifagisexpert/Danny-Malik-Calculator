@@ -170,7 +170,7 @@ with col2:
 
 
 with col3:
-    st.subheader("📍 Multi-CSV Nearby Job Finder and Lat Long converter")
+    st.subheader("📍 Multi-CSV Nearby Point Finder")
     st.write("")
     st.write("Upload multiple CSVs with Easting/Northing (GDA2020 MGA Zone 56). "
              "Each file will be checked against the others for nearby points.")
@@ -201,6 +201,8 @@ with col3:
             all_dfs = {}
             transformer = Transformer.from_crs("EPSG:7856", "EPSG:4326", always_xy=True)
 
+            st.info("📂 Reading uploaded files...")
+
             # Step 1: Load and convert all CSVs
             for file in uploaded_files:
                 df = read_csv_safe(file)
@@ -218,9 +220,12 @@ with col3:
                 df["Y"] = lats
 
                 all_dfs[file.name] = (df, easting_col, northing_col)
+                st.success(f"✅ Loaded and converted: {file.name}")
 
             # Step 2: Compare each sheet against others
             for fname, (df, easting_col, northing_col) in all_dfs.items():
+                st.info(f"⏳ Processing {fname}...")
+
                 results_dict = {other_name: [] for other_name in all_dfs if other_name != fname}
 
                 for idx, row in df.iterrows():
@@ -238,7 +243,6 @@ with col3:
                             for j, d in enumerate(dists) if d <= radius
                         ]
 
-                        # Add comma-separated job numbers
                         results_dict[other_name].append(",".join(matched_jobs) if matched_jobs else "")
 
                 # Step 3: Attach results as new columns
@@ -257,7 +261,9 @@ with col3:
                     mime="text/csv"
                 )
 
-            st.success("✅ Processing complete for all uploaded CSVs!")
+                st.success(f"✅ Finished processing: {fname}")
+
+            st.success("🎉 All uploaded CSVs processed successfully!")
 
         except Exception as e:
             st.error(f"⚠️ Error: {e}")
@@ -271,6 +277,7 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
 
