@@ -250,7 +250,7 @@ with col3:
                 output = io.StringIO()
                 df.to_csv(output, index=False)
 
-                st.success(f"✅ {fname} ready for download")
+                
                 st.download_button(
                     label=f"📥 Download {fname} with nearby matches",
                     data=output.getvalue(),
@@ -272,6 +272,7 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
 
