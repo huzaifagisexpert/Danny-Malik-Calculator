@@ -29,6 +29,8 @@ with colb:
         st.write("")
         st.write("")
 
+col1, col2, col3 = st.columns([4, 4, 4])
+
 with col1:
 
 
@@ -269,5 +271,6 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
