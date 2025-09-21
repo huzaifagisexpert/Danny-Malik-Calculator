@@ -29,8 +29,6 @@ with colb:
         st.write("")
         st.write("")
 
-col1, col2, col3 = st.columns([4, 4, 4])
-
 with col1:
 
 
@@ -42,11 +40,16 @@ with col1:
 
     # ---- Main Processing Function ----
     def process_file(uploaded_file, radii):
-        df = pd.read_csv(uploaded_file)
+         
+        try:
+            df = pd.read_csv(uploaded_file)
+        except UnicodeDecodeError:
+            uploaded_file.seek(0)
+            df = pd.read_csv(uploaded_file, encoding='latin1')
 
         # Detect Easting/Northing columns
-        easting_col = find_column(df, ["Easting", "east", "X"])
-        northing_col = find_column(df, ["Northing", "north", "Y"])
+        easting_col = find_column(df, ["Easting", "east", "X","job_easting"])
+        northing_col = find_column(df, ["Northing", "north", "Y","job_northing"])
 
         # Convert Easting/Northing → Lat/Lon (X, Y)
         transformer = Transformer.from_crs("EPSG:7856", "EPSG:4326", always_xy=True)
@@ -164,7 +167,6 @@ with col2:
 
 
 
-
 with col3:
     st.subheader("📍 Multi-CSV Nearby Job Finder and Lat Long converter")
     st.write("")
@@ -257,3 +259,15 @@ with col3:
 
         except Exception as e:
             st.error(f"⚠️ Error: {e}")
+
+
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
+
