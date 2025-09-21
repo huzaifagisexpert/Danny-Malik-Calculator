@@ -170,7 +170,7 @@ with col2:
 
 
 with col3:
-    st.subheader("📍 Multi-CSV Nearby Point Finder")
+    st.subheader("📂 Multi-CSV Nearby Point Finder")
     st.write("")
     st.write("Upload multiple CSVs with Easting/Northing (GDA2020 MGA Zone 56). "
              "Each file will be checked against the others for nearby points.")
@@ -201,13 +201,10 @@ with col3:
             all_dfs = {}
             transformer = Transformer.from_crs("EPSG:7856", "EPSG:4326", always_xy=True)
 
-            st.info("📂 Reading uploaded files...")
-
             # Step 1: Load and convert all CSVs
             for file in uploaded_files:
                 df = read_csv_safe(file)
 
-                # Detect Easting/Northing cols
                 easting_col = find_column(df, ["Easting", "east", "X", "job_easting"])
                 northing_col = find_column(df, ["Northing", "north", "Y", "job_northing"])
 
@@ -220,11 +217,10 @@ with col3:
                 df["Y"] = lats
 
                 all_dfs[file.name] = (df, easting_col, northing_col)
-                st.success(f"✅ Loaded and converted: {file.name}")
 
-            # Step 2: Compare each sheet against others
+            # Step 2: Process each file vs others
             for fname, (df, easting_col, northing_col) in all_dfs.items():
-                st.info(f"⏳ Processing {fname}...")
+                st.info(f"⏳ Processing {fname} ...")
 
                 results_dict = {other_name: [] for other_name in all_dfs if other_name != fname}
 
@@ -245,15 +241,16 @@ with col3:
 
                         results_dict[other_name].append(",".join(matched_jobs) if matched_jobs else "")
 
-                # Step 3: Attach results as new columns
+                # Add new columns for each other file
                 for other_name, values in results_dict.items():
                     col_name = f"nearby_{Path(other_name).stem}_{radius}m"
                     df[col_name] = values
 
-                # Step 4: Export
+                # Export
                 output = io.StringIO()
                 df.to_csv(output, index=False)
 
+                st.success(f"✅ {fname} ready for download")
                 st.download_button(
                     label=f"📥 Download {fname} with nearby matches",
                     data=output.getvalue(),
@@ -261,9 +258,7 @@ with col3:
                     mime="text/csv"
                 )
 
-                st.success(f"✅ Finished processing: {fname}")
-
-            st.success("🎉 All uploaded CSVs processed successfully!")
+            st.success("🎉 All files processed!")
 
         except Exception as e:
             st.error(f"⚠️ Error: {e}")
@@ -277,6 +272,7 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
 
