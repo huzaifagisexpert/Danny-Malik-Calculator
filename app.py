@@ -205,8 +205,8 @@ with col3:
             for file in uploaded_files:
                 df = read_csv_safe(file)
 
-                easting_col = find_column(df, ["Easting", "east", "X", "job_easting"])
-                northing_col = find_column(df, ["Northing", "north", "Y", "job_northing"])
+                easting_col = find_column(df, ["Easting", "east", "X", "job_easting","latitude","lat"])
+                northing_col = find_column(df, ["Northing", "north", "Y", "job_northing","longitude","lon","long"])
 
                 # Drop rows with invalid coords
                 df = df[(df[easting_col] != 0) & (df[northing_col] != 0)]
@@ -272,6 +272,7 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
 
